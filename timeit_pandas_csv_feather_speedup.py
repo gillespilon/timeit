@@ -3,6 +3,11 @@
 Evaluate improving the speed of a very large pandas DataFrame by using a
 feather file and by downcasting integer columns and convert an object column
 to a category column.
+
+Three methods of selecting rows are evaluated:
+- bracket notation, def f1
+- index, def f2
+- .loc, def f3
 """
 
 from typing import NoReturn
@@ -21,6 +26,9 @@ def f1(
     column: str,
     value: str
 ) -> pd.DataFrame:
+    """
+    Selecting rows using bracket notation
+    """
     df = df[df[column] == value]
     return df
 
@@ -30,6 +38,9 @@ def f2(
     column: str,
     value: str
 ) -> pd.DataFrame:
+    """
+    Selecting rows using index
+    """
     df = df.set_index(
         keys=column,
         drop=False
@@ -43,6 +54,9 @@ def f3(
     column: str,
     value: str
 ) -> pd.DataFrame:
+    """
+    Selecting rows using .loc
+    """
     df = df.loc[df[column] == value, :]
     return df
 
@@ -52,9 +66,21 @@ def compare_functions(
     replications: int
 ) -> NoReturn:
     start_time = time.perf_counter()
-    stmt_f1 = 'result = f1(df=df, column="category", value="A")'
-    stmt_f1 = 'result = f2(df=df, column="category", value="A")'
-    stmt_f1 = 'result = f3(df=df, column="category", value="A")'
+    stmt_f1 = """df = f1(
+        df=example_df,
+        column=COLUMN,
+        value=VALUE
+    )"""
+    stmt_f2 = """df = f2(
+        df=example_df,
+        column=COLUMN,
+        value=VALUE
+    )"""
+    stmt_f3 = """df = f3(
+        df=example_df,
+        column=COLUMN,
+        value=VALUE
+    )"""
     time_f1 = timeit.repeat(
         stmt=stmt_f1,
         setup='pass',
@@ -63,14 +89,14 @@ def compare_functions(
         globals=globals()
     )
     time_f2 = timeit.repeat(
-        stmt=stmt_f1,
+        stmt=stmt_f2,
         setup='pass',
         repeat=replications,
         number=repetitions,
         globals=globals()
     )
     time_f3 = timeit.repeat(
-        stmt=stmt_f1,
+        stmt=stmt_f3,
         setup='pass',
         repeat=replications,
         number=repetitions,
@@ -119,7 +145,7 @@ def read_large_csv_file(
     start_time = time.perf_counter()
     chunk = pd.read_csv(
         filepath_or_buffer=path_csv,
-        chunksize=1000000
+        chunksize=chunksize
     )
     stop_time = time.perf_counter()
     ds.report_summary(
@@ -198,42 +224,44 @@ def read_large_feather_file(
 
 
 def main():
-    global df
-    path_feather = Path("very_large.feather")
-    path_csv = Path("very_large.csv")
-    rows_per_category = 2500000
-    chunksize = 1000000
-    repetitions = 10
-    replications = 5
+    global example_df, COLUMN, VALUE
+    PATH_FEATHER = Path("very_large.feather")
+    PATH_CSV = Path("very_large.csv")
+    ROWS_PER_CATEGORY = 2500000
+    CHUNKSIZE = 1000000
+    COLUMN = "category"
+    REPETITIONS = 10
+    REPLICATIONS = 5
+    VALUE = "A"
     gc.enable()
     # create_large_csv_file(
-    #     path_csv=path_csv,
-    #     rows_per_category-rows_per_category
+    #     path_csv=PATH_CSV,
+    #     rows_per_category=ROWS_PER_CATEGORY
     # )
-    # df = read_large_csv_file(path_csv=path_csv)
+    # df = read_large_csv_file(path_csv=PATH_CSV)
     # df = optimize_columns(df=df)
     # save_csv_file_as_feather_file(
     #     df=df,
-    #     path_feather=path_feather
+    #     path_feather=PATH_FEATHER
     # )
     print("Analysis using feather file")
     print("---------------------------")
     print()
-    df = read_large_feather_file(path_feather=path_feather)
+    example_df = read_large_feather_file(path_feather=PATH_FEATHER)
     compare_functions(
-        repetitions=repetitions,
-        replications=replications
+        repetitions=REPETITIONS,
+        replications=REPLICATIONS
     )
     print("Analysis using csv file")
     print("-----------------------")
     print()
-    df = read_large_csv_file(
-        path_csv=path_csv,
-        chunksize=chunksize
+    example_df = read_large_csv_file(
+        path_csv=PATH_CSV,
+        chunksize=CHUNKSIZE
     )
     compare_functions(
-        repetitions=repetitions,
-        replications=replications
+        repetitions=REPETITIONS,
+        replications=REPLICATIONS
     )
 
 
