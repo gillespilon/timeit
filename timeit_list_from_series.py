@@ -80,10 +80,10 @@ def compare_functions():
 #     setup_code_f4 = '''
 # from __main__ import f4
 # '''
-    stmt_code_f1 = 'df = f1(df=random_dataframe, column=series_column)'
-    stmt_code_f2 = 'df = f2(df=random_dataframe, column=series_column)'
-    stmt_code_f3 = 'df = f3(df=random_dataframe, column=series_column)'
-    stmt_code_f4 = 'df = f4(df=random_dataframe, column=series_column)'
+    stmt_code_f1 = 'result = f1(df=random_dataframe, column=series_column)'
+    stmt_code_f2 = 'result = f2(df=random_dataframe, column=series_column)'
+    stmt_code_f3 = 'result = f3(df=random_dataframe, column=series_column)'
+    stmt_code_f4 = 'result = f4(df=random_dataframe, column=series_column)'
     times_f1 = timeit.repeat(
         stmt=stmt_code_f1,
         setup='pass',
