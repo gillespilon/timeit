@@ -59,9 +59,6 @@ def compare_functions(
     repetitions: int,
     replications: int
 ) -> NoReturn:
-    #     setup_code_f1 = """
-    # from __main__ import f1
-    # """
     stmt_f1 = """df = f1(
         df=example_dataframe,
         dictionary=replacement_dictionary
